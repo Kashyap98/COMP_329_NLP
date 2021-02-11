@@ -4,7 +4,7 @@ from collections import Counter
 
 MAIN_DIR = os.path.join(os.getcwd(), "..")
 HOMEWORK_1_FOLDER = os.path.join(MAIN_DIR, "HW_1")
-HOMEWORK_1_DATA_FOLDER = os.path.join(HOMEWORK_1_FOLDER, "data")
+HOMEWORK_1_DATA_FOLDER = os.path.join(MAIN_DIR, "data")
 NEGATIVE_REVIEWS_PATH = os.path.join(HOMEWORK_1_DATA_FOLDER, 'negative_reviews.txt')
 POSITIVES_REVIEWS_PATH = os.path.join(HOMEWORK_1_DATA_FOLDER, 'positive_reviews.txt')
 
