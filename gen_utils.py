@@ -4,15 +4,16 @@ from collections import Counter
 
 MAIN_DIR = os.path.join(os.getcwd(), "..")
 HOMEWORK_1_FOLDER = os.path.join(MAIN_DIR, "HW_1")
-HOMEWORK_1_DATA_FOLDER = os.path.join(MAIN_DIR, "data")
-NEGATIVE_REVIEWS_PATH = os.path.join(HOMEWORK_1_DATA_FOLDER, 'negative_reviews.txt')
-POSITIVES_REVIEWS_PATH = os.path.join(HOMEWORK_1_DATA_FOLDER, 'positive_reviews.txt')
+DATA_FOLDER = os.path.join(MAIN_DIR, "data")
+NEGATIVE_REVIEWS_PATH = os.path.join(DATA_FOLDER, 'negative_reviews.txt')
+POSITIVES_REVIEWS_PATH = os.path.join(DATA_FOLDER, 'positive_reviews.txt')
+STOP_WORDS_PATH = os.path.join(DATA_FOLDER, "stopwords.txt")
 
 
 def get_sentence_list_for_word_file(file_path: str) -> list:
     # get file data
     with open(file_path, 'r') as review_file:
-        file_text = review_file.readlines()
+        file_text = review_file.read().splitlines()
         return file_text
 
 
