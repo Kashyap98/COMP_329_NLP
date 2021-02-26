@@ -98,6 +98,10 @@ class Results:
         self.calc_specificity()
         self.calc_f1_score()
 
+        print()
+        print("----------------------")
+        print("Begin Result Report")
+
         print(f"{self.positive=}")
         print(f"{self.negative=}")
         print(f"{self.total=}")

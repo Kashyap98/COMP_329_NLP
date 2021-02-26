@@ -1,12 +1,10 @@
 import collections
 import math
 
-import gen_utils
-
 
 class NaiveBayesClassifier:
 
-    def __init__(self, training_data: list, stop_word_filter: list = None, max_words: int = 1000):
+    def __init__(self, training_data: list, stop_word_filter: list = None, max_words: int = None):
         """
         This Naive Bayes Classifier is made to predict values from input data based on training data provided.
         @param training_data: List of tuples (sentence: str, value: int). This data will be converted to proportions.
@@ -18,18 +16,21 @@ class NaiveBayesClassifier:
             raise ValueError("Training data is empty.")
 
         if stop_word_filter is None:
-            stop_word_filter = list()
+            stop_word_filter = []
+
+        if max_words is None:
+            max_words = math.inf
 
         self.training_data = training_data
         self.max_words = max_words
         self.stop_word_filter = stop_word_filter
         self.data_word_counts: dict = collections.defaultdict(collections.Counter)
-        self.data_word_proportions: dict = dict()
+        self.data_word_proportions: dict = {}
 
         self.prediction_counts = collections.Counter()
         self.prediction_values = set()
         self.total_prediction_count: int = 0
-        self.prediction_proportions: dict = dict()
+        self.prediction_proportions: dict = {}
 
         # perform init functions
         self.get_unique_prediction_values()
@@ -42,6 +43,7 @@ class NaiveBayesClassifier:
 
         def tuple_sorter(item):
             return item[1]
+
         prediction_tuple = sorted(prediction_tuple, key=tuple_sorter)
         return prediction_tuple
 
@@ -67,7 +69,7 @@ class NaiveBayesClassifier:
 
         # convert prediction counts to proportions
         for prediction, count in self.prediction_proportions.items():
-            self.prediction_proportions[prediction] = round(count / self.total_prediction_count, 4)
+            self.prediction_proportions[prediction] = round(count / self.total_prediction_count, 10)
 
     def get_counts_for_training_data(self):
         """
@@ -95,7 +97,7 @@ class NaiveBayesClassifier:
                     break
                 if word not in self.stop_word_filter:
                     current_count += 1
-                    proportions_dict[word] = math.log(round(count / self.prediction_counts[value], 4), 10)
+                    proportions_dict[word] = math.log(round(count / self.prediction_counts[value], 10), 10)
 
             self.data_word_proportions[value] = proportions_dict
 
@@ -112,7 +114,7 @@ class NaiveBayesClassifier:
             for word in words:
                 # current only looking at words we have previously seen
                 if word in value_proportions:
-                    estimate = round(estimate + value_proportions[word], 4)
+                    estimate = round(estimate + value_proportions[word], 10)
 
             estimate = math.pow(10, estimate)
             prediction_estimates.append((value, estimate))
