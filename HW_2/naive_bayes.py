@@ -1,10 +1,11 @@
 import collections
 import math
+from typing import Tuple, List
 
 
 class NaiveBayesClassifier:
 
-    def __init__(self, training_data: list, stop_word_filter: list = None, max_words: int = None):
+    def __init__(self, training_data: List[Tuple[str, int]], stop_word_filter: List[str] = None, max_words: int = None):
         """
         This Naive Bayes Classifier is made to predict values from input data based on training data provided.
         @param training_data: List of tuples (sentence: str, value: int). This data will be converted to proportions.
@@ -25,6 +26,7 @@ class NaiveBayesClassifier:
         self.max_words = max_words
         self.stop_word_filter = stop_word_filter
         self.data_word_counts: dict = collections.defaultdict(collections.Counter)
+        self.word_count_by_prediction: dict = collections.defaultdict(int)
         self.data_word_proportions: dict = {}
 
         self.prediction_counts = collections.Counter()
@@ -39,18 +41,33 @@ class NaiveBayesClassifier:
 
         self.total: int = 0
 
-    def _sort_predictions(self, prediction_tuple: list) -> list:
+    def _sort_predictions(self, prediction_tuple: List[Tuple[str, int]]) -> List[Tuple[str, int]]:
 
         def tuple_sorter(item):
             return item[1]
 
-        prediction_tuple = sorted(prediction_tuple, key=tuple_sorter)
+        # put the highest prediction value first.
+        prediction_tuple = sorted(prediction_tuple, key=tuple_sorter, reverse=True)
         return prediction_tuple
+
+    def _filter_words(self, words: List[str]) -> List[str]:
+        # filter words if necessary
+        if self.stop_word_filter is not []:
+            filtered_words = []
+            for word in words:
+                if word not in self.stop_word_filter:
+                    filtered_words.append(word)
+        else:
+            filtered_words = words
+
+        return filtered_words
 
     def get_unique_prediction_values(self):
         """
         For the purposes of the homework this is ony binary. However, this function should be able to work even when
-        the prediction is not a binary result (y/n)
+        the prediction is not a binary result (y/n).
+
+        This function gets the counts for each class that we will be predicting for.
         """
         prediction_values: list = [value[1] for value in self.training_data]
         self.prediction_counts.update(prediction_values)
@@ -80,8 +97,10 @@ class NaiveBayesClassifier:
             sentence, value = data[0], data[1]
             # update relevant output value counts with words from the sentence
             words = sentence.split(" ")
+            filtered_words = self._filter_words(words)
 
-            self.data_word_counts[value].update(words)
+            self.data_word_counts[value].update(filtered_words)
+            self.word_count_by_prediction[value] = self.word_count_by_prediction[value] + len(filtered_words)
 
     def convert_counts_to_proportions_for_training_data(self):
         """
@@ -95,13 +114,15 @@ class NaiveBayesClassifier:
             for word, count in counter.items():
                 if current_count >= self.max_words:
                     break
-                if word not in self.stop_word_filter:
-                    current_count += 1
-                    proportions_dict[word] = math.log(round(count / self.prediction_counts[value], 10), 10)
+                current_count += 1
+
+                # convert value to log to prevent float underflow
+                proportions_dict[word] = math.log(
+                    round(count / self.word_count_by_prediction[value] + len(counter), 10))
 
             self.data_word_proportions[value] = proportions_dict
 
-    def predict_one_sentence_value(self, sentence):
+    def predict_one_sentence_value(self, sentence: str) -> Tuple:
         words = sentence.split(" ")
         prediction_estimates = []
 
@@ -115,8 +136,13 @@ class NaiveBayesClassifier:
                 # current only looking at words we have previously seen
                 if word in value_proportions:
                     estimate = round(estimate + value_proportions[word], 10)
+                else:
+                    # use laplace smoothing for words we do not have the value for.
+                    estimate = round(estimate + (1 / (self.word_count_by_prediction[value] / len(value_proportions))),
+                                     10)
 
-            estimate = math.pow(10, estimate)
+            # convert log value back to un normalized - done to prevent float underflow
+            estimate = math.pow(math.e, estimate)
             prediction_estimates.append((value, estimate))
 
         # sort predictions from most likely to least likely
