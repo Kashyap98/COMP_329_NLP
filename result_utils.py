@@ -1,3 +1,5 @@
+from typing import Tuple, Callable, List
+
 
 class Results:
     """
@@ -91,32 +93,71 @@ class Results:
         """
         self.f1_score = round((2 * (self.precision * self.recall)) / (self.precision + self.recall), 2)
 
-    def report(self):
+    def report(self, print_results: bool = True):
         self.calc_accuracy()
         self.calc_precision()
         self.calc_recall()
         self.calc_specificity()
         self.calc_f1_score()
 
-        print()
-        print("----------------------")
-        print("Begin Result Report")
+        if print_results:
+            print()
+            print("----------------------")
+            print("Begin Result Report")
 
-        print(f"{self.positive=}")
-        print(f"{self.negative=}")
-        print(f"{self.total=}")
-        print()
+            print(f"{self.positive=}")
+            print(f"{self.negative=}")
+            print(f"{self.total=}")
+            print()
 
-        print(f"{self.accuracy=}")
-        print(f"{self.precision=}")
-        print(f"{self.recall=}")
-        print(f"{self.specificity=}")
-        print(f"{self.f1_score=}")
-        print()
+            print(f"{self.accuracy=}")
+            print(f"{self.precision=}")
+            print(f"{self.recall=}")
+            print(f"{self.specificity=}")
+            print(f"{self.f1_score=}")
+            print()
 
-        print(f"       P       N    ")
-        print(f"   - - - - - - - - -")
-        print(f"P  -  {self.true_positive} -  {self.false_positive}  -")
-        print(f"   - - - - - - - - -")
-        print(f"N  -  {self.false_negative} -  {self.true_negative}  -")
-        print(f"   - - - - - - - - -")
+            print(f"       P       N    ")
+            print(f"   - - - - - - - - -")
+            print(f"P  -  {self.true_positive} -  {self.false_positive}  -")
+            print(f"   - - - - - - - - -")
+            print(f"N  -  {self.false_negative} -  {self.true_negative}  -")
+            print(f"   - - - - - - - - -")
+
+
+def get_maximum_results(iter_start: int, iter_end: int, iter_step: int,
+                        model_func: Callable[[List[Tuple[str, int]], List[Tuple[str, int]], int], Results],
+                        training_data: List[Tuple[str, int]],
+                        testing_data: List[Tuple[str, int]]) -> Tuple[Results, int]:
+    """
+    Continually run a model func for as many iterations as tasked to find maximum result and words used.
+    @param iter_start: max words start
+    @param iter_end: max words end
+    @param iter_step: step of max words
+    @param model_func: classifier running method
+    @param training_data: list of labeled input training data
+    @param testing_data: list of labeled input test data
+    @return: tuple of maximum result report and corresponding value
+    """
+    max_results = None
+    max_words_value = None
+
+    # continue running iterator for designated values
+    for max_words_iter in range(iter_start, iter_end, iter_step):
+        print(f"Testing max words: {max_words_iter:,}")
+        run_results = model_func(training_data, testing_data, max_words_iter)
+        run_results.report(print_results=False)
+
+        # replace maximum value if necessary
+        if max_results is None:
+            max_results = run_results
+            max_words_value = max_words_iter
+        else:
+            if run_results.accuracy > max_results.accuracy:
+                max_results = run_results
+                max_words_value = max_words_iter
+
+    # output final results
+    print(max_results.report())
+    print(f"Max words for report: {max_words_value:,}")
+    return max_results, max_words_value

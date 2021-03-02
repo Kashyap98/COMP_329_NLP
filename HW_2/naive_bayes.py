@@ -41,9 +41,14 @@ class NaiveBayesClassifier:
 
         self.total: int = 0
 
-    def _sort_predictions(self, prediction_tuple: List[Tuple[str, int]]) -> List[Tuple[str, int]]:
-
-        def tuple_sorter(item):
+    @staticmethod
+    def _sort_predictions(prediction_tuple: List[Tuple[str, float]]) -> List[Tuple[str, float]]:
+        """
+        Sort the class predications from most likely to least
+        @param prediction_tuple: predicted classes and prediction weight
+        @return: sorted prediction classes and weights
+        """
+        def tuple_sorter(item: Tuple[str, float]) -> float:
             return item[1]
 
         # put the highest prediction value first.
@@ -51,6 +56,11 @@ class NaiveBayesClassifier:
         return prediction_tuple
 
     def _filter_words(self, words: List[str]) -> List[str]:
+        """
+        Remove words based on stop filter
+        @param words: words in the sentence
+        @return: words that are not in the set filter
+        """
         # filter words if necessary
         if self.stop_word_filter is not []:
             filtered_words = []
@@ -86,7 +96,7 @@ class NaiveBayesClassifier:
 
         # convert prediction counts to proportions
         for prediction, count in self.prediction_proportions.items():
-            self.prediction_proportions[prediction] = round(count / self.total_prediction_count, 10)
+            self.prediction_proportions[prediction] = count / self.total_prediction_count
 
     def get_counts_for_training_data(self):
         """
@@ -110,6 +120,7 @@ class NaiveBayesClassifier:
         for value, counter in self.data_word_counts.items():
             proportions_dict = {}
             current_count = 0
+            proportion_denominator = math.log(len(counter))
 
             for word, count in counter.items():
                 if current_count >= self.max_words:
@@ -117,29 +128,34 @@ class NaiveBayesClassifier:
                 current_count += 1
 
                 # convert value to log to prevent float underflow
-                proportions_dict[word] = math.log(
-                    round(count / self.word_count_by_prediction[value] + len(counter), 10))
+                proportions_dict[word] = math.log(count) - proportion_denominator
 
             self.data_word_proportions[value] = proportions_dict
 
-    def predict_one_sentence_value(self, sentence: str) -> Tuple:
+    def predict_one_sentence_value(self, sentence: str) -> List[Tuple[str, float]]:
+        """
+        Predict value of sentence from classes based on previous proportions
+        @param sentence: sentence that will be predicted on
+        @return: tuple of prediction values and weights
+        """
         words = sentence.split(" ")
         prediction_estimates = []
 
         # get an estimate for each prediction this classifier can make
         for value in self.prediction_values:
             value_proportions = self.data_word_proportions[value]
-            estimate = 0
+            estimate: float = math.log(self.prediction_proportions[value])
 
             # go through sentence and use previous proportions
             for word in words:
                 # current only looking at words we have previously seen
                 if word in value_proportions:
-                    estimate = round(estimate + value_proportions[word], 10)
+                    estimate = estimate + value_proportions[word]
                 else:
                     # use laplace smoothing for words we do not have the value for.
-                    estimate = round(estimate + (1 / (self.word_count_by_prediction[value] / len(value_proportions))),
-                                     10)
+                    estimate = estimate + \
+                               (math.log(1) -
+                                (math.log(self.word_count_by_prediction[value] + len(value_proportions) + 1)))
 
             # convert log value back to un normalized - done to prevent float underflow
             estimate = math.pow(math.e, estimate)
