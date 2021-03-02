@@ -127,7 +127,7 @@ class Results:
 
 def get_maximum_results(iter_start: int, iter_end: int, iter_step: int,
                         model_func: Callable[[List[Tuple[str, int]], List[Tuple[str, int]], int],
-                                             Tuple[Results, List[Tuple[str, float]]]],
+                                             Tuple[Results, List[Tuple[str, List[Tuple[str, float]]]]]],
                         training_data: List[Tuple[str, int]],
                         testing_data: List[Tuple[str, int]]) -> Tuple[Results, int]:
     """

@@ -118,16 +118,21 @@ class NaiveBayesClassifier:
         classifier can pull these values for a predication of a new value.
         """
         for value, counter in self.data_word_counts.items():
+            # get classifier max words
+            classifier_word_count = min(len(counter), self.max_words)
+            classifier_words: Tuple[str, int] = counter.most_common(classifier_word_count)
+
+            # count words used in classifier based on max_words
+            word_counts = 0
+            for word, count in classifier_words:
+                word_counts += count
+
+            self.word_count_by_prediction[value] = word_counts
             proportions_dict = {}
-            current_count = 0
-            proportion_denominator = math.log(len(counter))
+            proportion_denominator = math.log(self.word_count_by_prediction[value] + classifier_word_count)
 
-            for word, count in counter.items():
-                if current_count >= self.max_words:
-                    break
-                current_count += 1
-
-                # convert value to log to prevent float underflow
+            # generate proportions for classifier
+            for word, count in classifier_words:
                 proportions_dict[word] = math.log(count) - proportion_denominator
 
             self.data_word_proportions[value] = proportions_dict
