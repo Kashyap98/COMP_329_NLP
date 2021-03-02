@@ -158,7 +158,7 @@ class NaiveBayesClassifier:
                                 (math.log(self.word_count_by_prediction[value] + len(value_proportions) + 1)))
 
             # convert log value back to un normalized - done to prevent float underflow
-            estimate = math.pow(math.e, estimate)
+            # estimate = math.pow(math.e, estimate)
             prediction_estimates.append((value, estimate))
 
         # sort predictions from most likely to least likely

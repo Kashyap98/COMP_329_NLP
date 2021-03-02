@@ -126,7 +126,8 @@ class Results:
 
 
 def get_maximum_results(iter_start: int, iter_end: int, iter_step: int,
-                        model_func: Callable[[List[Tuple[str, int]], List[Tuple[str, int]], int], Results],
+                        model_func: Callable[[List[Tuple[str, int]], List[Tuple[str, int]], int],
+                                             Tuple[Results, List[Tuple[str, float]]]],
                         training_data: List[Tuple[str, int]],
                         testing_data: List[Tuple[str, int]]) -> Tuple[Results, int]:
     """
@@ -145,7 +146,7 @@ def get_maximum_results(iter_start: int, iter_end: int, iter_step: int,
     # continue running iterator for designated values
     for max_words_iter in range(iter_start, iter_end, iter_step):
         print(f"Testing max words: {max_words_iter:,}")
-        run_results = model_func(training_data, testing_data, max_words_iter)
+        run_results, predictions = model_func(training_data, testing_data, max_words_iter)
         run_results.report(print_results=False)
 
         # replace maximum value if necessary
