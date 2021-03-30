@@ -37,25 +37,22 @@ class Results:
         else:
             print("An error has occurred in analysis.")
 
+    def add_multiclass_result(self, result: int, expected_result: int):
+        if result == expected_result:
+            self.true_positive += 1
+        else:
+            self.true_negative += 1
+
     def add_positive(self):
         self.positive += 1
-        self.total += 1
+        self.add_to_total()
 
     def add_negative(self):
         self.negative += 1
+        self.add_to_total()
+
+    def add_to_total(self):
         self.total += 1
-
-    def add_false_negative(self):
-        self.false_negative += 1
-
-    def add_false_positive(self):
-        self.false_positive += 1
-
-    def add_true_positive(self):
-        self.true_positive += 1
-
-    def add_true_negative(self):
-        self.true_negative += 1
 
     def calc_accuracy(self):
         """

@@ -1,7 +1,7 @@
 
 import os
 import random
-from typing import Tuple, List
+from typing import Tuple, List, Any
 
 MAIN_DIR = os.path.join(os.getcwd(), "..")
 HOMEWORK_1_FOLDER = os.path.join(MAIN_DIR, "HW_1")
@@ -10,6 +10,8 @@ NEGATIVE_REVIEWS_PATH = os.path.join(DATA_FOLDER, 'negative_reviews.txt')
 POSITIVES_REVIEWS_PATH = os.path.join(DATA_FOLDER, 'positive_reviews.txt')
 STOP_WORDS_PATH = os.path.join(DATA_FOLDER, "stopwords.txt")
 PUNCTUATION_PATH = os.path.join(DATA_FOLDER, "punctuation.txt")
+
+HATE_SPEECH_PATH = os.path.join(DATA_FOLDER, "labeled_data.csv")
 
 
 def get_sentence_list_for_word_file(file_path: str) -> List[str]:
@@ -45,7 +47,7 @@ def format_input_data(positive_data: List[str], negative_data: list) -> Tuple[Li
     return positive_input_data, negative_input_data
 
 
-def split_data(input_data: List[Tuple[str, int]], split_percentage: float = 0.70) -> Tuple[List[Tuple[str, int]],
+def split_data(input_data: List[Tuple[Any, int]], split_percentage: float = 0.70) -> Tuple[List[Tuple[str, int]],
                                                                                            List[Tuple[str, int]]]:
     """
     Convert data into training and test data
@@ -53,11 +55,21 @@ def split_data(input_data: List[Tuple[str, int]], split_percentage: float = 0.70
     @param split_percentage: percentage of data that will be test/training
     @return: input data split by input percentages
     """
-    input_data = set(input_data)
-    training_count = int(len(input_data) * split_percentage)
+    try:
+        input_data = set(input_data)
+        training_count = int(len(input_data) * split_percentage)
 
-    training_data = set(random.sample(input_data, training_count))
-    test_data = input_data - training_data
+        training_data = set(random.sample(input_data, training_count))
+        test_data = input_data - training_data
+    except TypeError:
+        training_count = int(len(input_data) * split_percentage)
+        counts_list = set([item for item in range(len(input_data))])
+
+        training_counts = set(random.sample(counts_list, training_count))
+        test_counts = counts_list - training_counts
+
+        training_data = [input_data[i] for i in training_counts]
+        test_data = [input_data[i] for i in test_counts]
 
     return list(training_data), list(test_data)
 
