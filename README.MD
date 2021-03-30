@@ -21,7 +21,7 @@ Homework 2 focused on our own implementation of the Naive Bayes classifier that 
 input data based on prior probabilities. This type of classifier is good for data that will likely have repeated data. In addition,
 this classifier is useful for less powerful machines because it can be quickly trained and optimized.
 
-My implementation of Naive Bayes seem to average around 75-76% accuracy for the movie review data set used in HW 1. This is and increase
+My implementation of Naive Bayes seem to average around 76-77% accuracy for the movie review data set used in HW 1. This is and increase
 of about ~15% over the previous method comparing lemmatization and a previous opinion lexicon. I noticed no major difference in accuracy
 when comparing a classifier using stop words to one that filters them out. I also performed all probability calculations in log space
 to prevent float underflow and used Laplace smoothing to correct for data not found in either class. 

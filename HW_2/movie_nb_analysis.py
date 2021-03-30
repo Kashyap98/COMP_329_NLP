@@ -16,7 +16,7 @@ def run_naive_bayes(training_data: List[Tuple[str, int]],
     @param max_words: maximum number of words that should be used in classifier
     @return: result of the classifier
     """
-    classifier = NaiveBayesClassifier(training_data=training_data, stop_word_filter=stop_words,
+    classifier = NaiveBayesClassifier(training_data=training_data,
                                       max_words=max_words)
     results = result_utils.Results()
     all_predictions = []
