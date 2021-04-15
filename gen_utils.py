@@ -12,6 +12,7 @@ STOP_WORDS_PATH = os.path.join(DATA_FOLDER, "stopwords.txt")
 PUNCTUATION_PATH = os.path.join(DATA_FOLDER, "punctuation.txt")
 
 HATE_SPEECH_PATH = os.path.join(DATA_FOLDER, "labeled_data.csv")
+HOTEL_REVIEW_DATA = os.path.join(DATA_FOLDER, "tripadvisor_hotel_reviews.csv")
 
 
 def get_sentence_list_for_word_file(file_path: str) -> List[str]:

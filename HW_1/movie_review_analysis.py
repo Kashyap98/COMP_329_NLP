@@ -35,29 +35,31 @@ def evaluate_sentence(sentence: str) -> bool:
     return is_sentence_positive
 
 
-results = result_utils.Results()
+if __name__ == '__main__':
 
-positive_review_data = gen_utils.get_sentence_list_for_word_file(gen_utils.POSITIVES_REVIEWS_PATH)
-negative_review_data = gen_utils.get_sentence_list_for_word_file(gen_utils.NEGATIVE_REVIEWS_PATH)
+    results = result_utils.Results()
 
-# progress is commented out for final submission
-# total_count = len(positive_review_data) + len(negative_review_data)
-# count = 0
+    positive_review_data = gen_utils.get_sentence_list_for_word_file(gen_utils.POSITIVES_REVIEWS_PATH)
+    negative_review_data = gen_utils.get_sentence_list_for_word_file(gen_utils.NEGATIVE_REVIEWS_PATH)
 
-# Run through all positive review
-for positive_review in positive_review_data:
-    results.add_positive()
-    is_positive = evaluate_sentence(positive_review)
-    results.add_result(is_positive, should_be_positive=True)
-    # count += 1
-    # print(f"Progress {count:,} / {total_count:,}")
+    # progress is commented out for final submission
+    # total_count = len(positive_review_data) + len(negative_review_data)
+    # count = 0
 
-# Run through all negative review
-for negative_review in negative_review_data:
-    results.add_negative()
-    is_positive = evaluate_sentence(negative_review)
-    results.add_result(is_positive, should_be_positive=False)
-    # count += 1
-    # print(f"Progress {count:,} / {total_count:,}")
+    # Run through all positive review
+    for positive_review in positive_review_data:
+        results.add_positive()
+        is_positive = evaluate_sentence(positive_review)
+        results.add_result(is_positive, should_be_positive=True)
+        # count += 1
+        # print(f"Progress {count:,} / {total_count:,}")
 
-results.report()
+    # Run through all negative review
+    for negative_review in negative_review_data:
+        results.add_negative()
+        is_positive = evaluate_sentence(negative_review)
+        results.add_result(is_positive, should_be_positive=False)
+        # count += 1
+        # print(f"Progress {count:,} / {total_count:,}")
+
+    results.report()
