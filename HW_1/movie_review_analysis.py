@@ -7,22 +7,22 @@ import result_utils
 def evaluate_sentence(sentence: str) -> bool:
     positive_count = 0
     negative_count = 0
-    # lemmatizer = WordNetLemmatizer()
+    lemmatizer = WordNetLemmatizer()
 
     # lemmatization is commented out for submission for speed and improved evaluation
-    # new_sentence = ""
-    # for word in sentence.split(" "):
-    #     new_sentence += lemmatizer.lemmatize(word)
-    # sentence = new_sentence
+    new_sentence = ""
+    for word in sentence.split(" "):
+        new_sentence += lemmatizer.lemmatize(word)
+    sentence = new_sentence
 
     for positive_word in opinion_lexicon.positive():
-        # positive_word = lemmatizer.lemmatize(positive_word)
+        positive_word = lemmatizer.lemmatize(positive_word)
 
         if positive_word in sentence:
             positive_count += 1
 
     for negative_word in opinion_lexicon.negative():
-        # negative_word = lemmatizer.lemmatize(negative_word)
+        negative_word = lemmatizer.lemmatize(negative_word)
 
         if negative_word in sentence:
             negative_count += 1
