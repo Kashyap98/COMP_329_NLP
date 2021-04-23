@@ -1,11 +1,13 @@
 from typing import Tuple, List
 
 import pandas as pd
+from sklearn import svm
 
 import gen_utils
 import result_utils
 from HW_1 import movie_review_analysis
 from HW_2 import movie_nb_analysis
+from HW_3 import toxic_comment_classification
 
 
 def get_hotel_review_data() -> Tuple[List[str], List[int]]:
@@ -39,6 +41,17 @@ def get_positive_and_negative_reviews(reviews: List[str], ratings: List[int], re
     return positive_reviews, negative_reviews
 
 
+def convert_ratings_to_binary(ratings: List[int]) -> List[int]:
+    new_ratings = []
+    for rating in ratings:
+        if rating > 3:
+            new_ratings.append(1)
+        else:
+            new_ratings.append(0)
+
+    return new_ratings
+
+
 def run_opinion_lexicon(positive_reviews: List[Tuple[str, int]], negative_reviews: List[Tuple[str, int]]):
     # lemmatizer testing didn't require training so splitting data was not necessary.
     lemmatizer_results = result_utils.Results()
@@ -65,7 +78,7 @@ def run_opinion_lexicon(positive_reviews: List[Tuple[str, int]], negative_review
     lemmatizer_results.report()
 
 
-def run_naive_bayes_classifier(positive_reviews: List[Tuple[str, int]], negative_reviews: List[Tuple[str, int]])
+def run_naive_bayes_classifier(positive_reviews: List[Tuple[str, int]], negative_reviews: List[Tuple[str, int]]):
     # split data into different sets
     positive_training, positive_test = gen_utils.split_data(positive_reviews)
     negative_training, negative_test = gen_utils.split_data(negative_reviews)
@@ -83,6 +96,24 @@ def run_naive_bayes_classifier(positive_reviews: List[Tuple[str, int]], negative
     movie_nb_analysis.output_most_certain_and_most_uncertain_predictions(classifier_predictions)
 
 
+def run_svm_classifier(reviews: List[str], ratings: List[int]):
+    review_vectors = toxic_comment_classification.use_sklearn_count_vectorizer(reviews)
+
+    # get final 70/30 split of data
+    v_train_data, v_test_data = toxic_comment_classification.transform_vectors_into_train_and_test(review_vectors,
+                                                                                                   ratings)
+    train_text, train_labels = zip(*v_train_data)
+    test_text, test_labels = zip(*v_test_data)
+
+    # train SVM classifier
+    clf_classifier = svm.LinearSVC()
+    clf_classifier.fit(train_text, train_labels)
+
+    # predict test data and output results
+    toxic_comment_classification.predict_svm_and_export_results(clf_classifier, test_text, test_labels,
+                                                                target_names=["1", "2", "3", "4", "5"])
+
+
 if __name__ == '__main__':
 
     print("Retrieving review data")
@@ -98,4 +129,11 @@ if __name__ == '__main__':
     # print("Running Naive Bayes Analysis")
     # run_naive_bayes_classifier(positive_review_list, negative_review_list)
 
+    # print("Use vectorizer to compare get SVM Analysis")
+    # run_svm_classifier(hotel_reviews, review_ratings)
 
+    print("Run K nearest neighbors classifier")
+
+    print("Run Decision Tree")
+
+    print("Run MLP Neural Network")

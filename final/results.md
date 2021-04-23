@@ -1,4 +1,4 @@
-### Opinion Lexicon Without Lemmatization
+# Opinion Lexicon Without Lemmatization
 
 self.accuracy=0.812<br>
 self.precision=0.863<br>
@@ -14,7 +14,7 @@ N  -  1739 -  3277  -
    - - - - - - - - -
 
 
-## Opinion Lexicon With Lemmatization
+# Opinion Lexicon With Lemmatization
 
 self.accuracy=0.756
 self.precision=0.888
@@ -54,3 +54,31 @@ sentence=great beach nice rooms fair food trip absolute minute booking booked 3/
 sentence=deal expectations not 4-5 star, want pampered stay elsewere, decent no frills place fine, staff friendly helpfull.the location cost ca n't beat.i avoid spring break peak time.the cuban resturant door excellent,   | value=0.01206404849762066 
 sentence=ok not great let say weather fantastic resort beautiful place maintained, food hand definetely average, tried golf times resort told no carts course tournament, did offer bus diferent course nice used large day doing, staying royal resturant, menu changes, breakfast not recomended buffet instead, bigger selection better, lunch, dinner like steak called veal medallions best steak, grilled lobster quite mushy edible, negril couples resort thought food atmosphere better, staff friendly tries helpful language barrier spanish cheat sheet thought great got, yes seaweed beach ocean, overal nice place yes issues fun,   | value=0.0009770747683433 
 ______________________________________________________________________
+
+# Linear SVC with Binary Classes
+
+precision    recall  f1-score   support
+
+           1       0.74      0.76      0.75      1600
+           0       0.91      0.91      0.91      4548
+
+    accuracy                           0.87      6148
+   macro avg       0.83      0.83      0.83      6148
+weighted avg       0.87      0.87      0.87      6148
+
+[[1214  386]
+ [ 416 4132]]
+
+# Linear SVC with Non Binary Classes
+
+ precision    recall  f1-score   support
+
+           1       0.64      0.58      0.61       428
+           2       0.37      0.31      0.34       534
+           3       0.26      0.25      0.26       639
+           4       0.44      0.45      0.44      1826
+           5       0.69      0.72      0.70      2721
+
+    accuracy                           0.55      6148
+   macro avg       0.48      0.46      0.47      6148
+weighted avg       0.54      0.55      0.54      6148

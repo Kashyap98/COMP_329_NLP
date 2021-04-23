@@ -47,7 +47,8 @@ def transform_vectors_into_train_and_test(vectors: List[List[int]],
     return train_data, test_data
 
 
-def predict_svm_and_export_results(clf, test_text_data: List[str], test_labels_data: List[int]):
+def predict_svm_and_export_results(clf, test_text_data: List[str], test_labels_data: List[int],
+                                   target_names: List[str]):
     # predict and capture results
     results = result_utils.Results()
     all_predictions = []
@@ -72,7 +73,7 @@ def predict_svm_and_export_results(clf, test_text_data: List[str], test_labels_d
     results.report()
     data, predicted = zip(*all_predictions)
     print(metrics.classification_report(test_labels_data, predicted,
-                                        target_names=["hate_speech", "offensive_language", "neither"]))
+                                        target_names=target_names))
     print(metrics.confusion_matrix(test_labels_data, predicted))
 
 
@@ -96,4 +97,5 @@ if __name__ == '__main__':
     clf_classifier.fit(train_text, train_labels)
 
     # predict test data and output results
-    predict_svm_and_export_results(clf_classifier, test_text, test_labels)
+    predict_svm_and_export_results(clf_classifier, test_text, test_labels,
+                                   target_names=["hate_speech", "offensive_language", "neither"])
