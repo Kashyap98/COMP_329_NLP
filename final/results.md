@@ -69,7 +69,7 @@ weighted avg       0.87      0.87      0.87      6148
 [[1214  386]
  [ 416 4132]]
 
-# Linear SVC with Non Binary Classes
+# Linear SVC with Non-Binary Classes
 
  precision    recall  f1-score   support
 
@@ -82,3 +82,43 @@ weighted avg       0.87      0.87      0.87      6148
     accuracy                           0.55      6148
    macro avg       0.48      0.46      0.47      6148
 weighted avg       0.54      0.55      0.54      6148
+
+# K Nearest Neighbors with Non-Binary Classes (n=27)
+              precision    recall  f1-score   support
+
+           1       0.45      0.10      0.17       442
+           2       0.37      0.10      0.15       538
+           3       0.30      0.05      0.08       634
+           4       0.43      0.25      0.31      1852
+           5       0.50      0.89      0.64      2682
+
+    accuracy                           0.48      6148
+   macro avg       0.41      0.28      0.27      6148
+weighted avg       0.44      0.48      0.41      6148
+
+# Decision Tree with Non-Binary Classes
+
+             precision    recall  f1-score   support
+
+           1       0.41      0.36      0.38       432
+           2       0.23      0.23      0.23       525
+           3       0.22      0.18      0.20       666
+           4       0.36      0.35      0.36      1786
+           5       0.60      0.64      0.62      2739
+
+    accuracy                           0.45      6148
+   macro avg       0.36      0.35      0.36      6148
+weighted avg       0.44      0.45      0.45      6148
+
+# MLP Neural Net with Non-Binary Classes
+
+           1       0.63      0.61      0.62       420
+           2       0.41      0.34      0.37       545
+           3       0.33      0.33      0.33       626
+           4       0.49      0.45      0.47      1830
+           5       0.70      0.76      0.73      2727
+
+    accuracy                           0.58      6148
+   macro avg       0.51      0.50      0.50      6148
+weighted avg       0.57      0.58      0.57      6148
+

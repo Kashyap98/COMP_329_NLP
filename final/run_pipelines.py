@@ -1,7 +1,10 @@
 from typing import Tuple, List
 
 import pandas as pd
-from sklearn import svm
+from sklearn import svm, metrics
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 import gen_utils
 import result_utils
@@ -41,6 +44,18 @@ def get_positive_and_negative_reviews(reviews: List[str], ratings: List[int], re
     return positive_reviews, negative_reviews
 
 
+def get_vectorized_train_and_test_data(reviews: List[str], ratings: List[int]):
+    review_vectors = toxic_comment_classification.use_sklearn_count_vectorizer(reviews)
+
+    # get final 70/30 split of data
+    v_train_data, v_test_data = toxic_comment_classification.transform_vectors_into_train_and_test(review_vectors,
+                                                                                                   ratings)
+    train_text, train_labels = zip(*v_train_data)
+    test_text, test_labels = zip(*v_test_data)
+
+    return train_text, train_labels, test_text, test_labels
+
+
 def convert_ratings_to_binary(ratings: List[int]) -> List[int]:
     new_ratings = []
     for rating in ratings:
@@ -52,8 +67,9 @@ def convert_ratings_to_binary(ratings: List[int]) -> List[int]:
     return new_ratings
 
 
-def run_opinion_lexicon(positive_reviews: List[Tuple[str, int]], negative_reviews: List[Tuple[str, int]]):
+def run_opinion_lexicon(reviews: List[str], ratings: List[int]):
     # lemmatizer testing didn't require training so splitting data was not necessary.
+    positive_reviews, negative_reviews = get_positive_and_negative_reviews(reviews, ratings, retain_ratings=False)
     lemmatizer_results = result_utils.Results()
     count = 0
     total_count = len(positive_reviews) + len(negative_reviews)
@@ -97,13 +113,7 @@ def run_naive_bayes_classifier(positive_reviews: List[Tuple[str, int]], negative
 
 
 def run_svm_classifier(reviews: List[str], ratings: List[int]):
-    review_vectors = toxic_comment_classification.use_sklearn_count_vectorizer(reviews)
-
-    # get final 70/30 split of data
-    v_train_data, v_test_data = toxic_comment_classification.transform_vectors_into_train_and_test(review_vectors,
-                                                                                                   ratings)
-    train_text, train_labels = zip(*v_train_data)
-    test_text, test_labels = zip(*v_test_data)
+    train_text, train_labels, test_text, test_labels = get_vectorized_train_and_test_data(reviews, ratings)
 
     # train SVM classifier
     clf_classifier = svm.LinearSVC()
@@ -112,6 +122,40 @@ def run_svm_classifier(reviews: List[str], ratings: List[int]):
     # predict test data and output results
     toxic_comment_classification.predict_svm_and_export_results(clf_classifier, test_text, test_labels,
                                                                 target_names=["1", "2", "3", "4", "5"])
+
+
+def run_k_nearest_neighbors_classifier(reviews: List[str], ratings: List[int]):
+    train_text, train_labels, test_text, test_labels = get_vectorized_train_and_test_data(reviews, ratings)
+    neigh = KNeighborsClassifier(n_neighbors=27)
+    neigh.fit(train_text, train_labels)
+    predictions = neigh.predict(test_text)
+
+    print(metrics.classification_report(test_labels, predictions,
+                                        target_names=["1", "2", "3", "4", "5"]))
+    print(metrics.confusion_matrix(test_labels, predictions))
+
+
+def run_decision_tree_classifier(reviews: List[str], ratings: List[int]):
+    train_text, train_labels, test_text, test_labels = get_vectorized_train_and_test_data(reviews, ratings)
+
+    clf = DecisionTreeClassifier(random_state=0)
+    clf.fit(train_text, train_labels)
+    predictions = clf.predict(test_text)
+
+    print(metrics.classification_report(test_labels, predictions,
+                                        target_names=["1", "2", "3", "4", "5"]))
+    print(metrics.confusion_matrix(test_labels, predictions))
+
+
+def run_neural_network(reviews: List[str], ratings: List[int]):
+    train_text, train_labels, test_text, test_labels = get_vectorized_train_and_test_data(reviews, ratings)
+
+    clf = MLPClassifier(random_state=1, max_iter=300).fit(train_text, train_labels)
+    predictions = clf.predict(test_text)
+
+    print(metrics.classification_report(test_labels, predictions,
+                                        target_names=["1", "2", "3", "4", "5"]))
+    print(metrics.confusion_matrix(test_labels, predictions))
 
 
 if __name__ == '__main__':
@@ -123,17 +167,20 @@ if __name__ == '__main__':
     positive_review_list, negative_review_list = get_positive_and_negative_reviews(hotel_reviews, review_ratings,
                                                                                    retain_ratings=False)
 
-    # print("Running opinion lexicon test")
-    # run_opinion_lexicon(hotel_reviews, review_ratings)
+    print("Running opinion lexicon test")
+    run_opinion_lexicon(hotel_reviews, review_ratings)
 
-    # print("Running Naive Bayes Analysis")
-    # run_naive_bayes_classifier(positive_review_list, negative_review_list)
+    print("Running Naive Bayes Analysis")
+    run_naive_bayes_classifier(positive_review_list, negative_review_list)
 
-    # print("Use vectorizer to compare get SVM Analysis")
-    # run_svm_classifier(hotel_reviews, review_ratings)
+    print("Use vectorizer to compare get SVM Analysis")
+    run_svm_classifier(hotel_reviews, review_ratings)
 
     print("Run K nearest neighbors classifier")
+    run_k_nearest_neighbors_classifier(hotel_reviews, review_ratings)
 
     print("Run Decision Tree")
+    run_decision_tree_classifier(hotel_reviews, review_ratings)
 
     print("Run MLP Neural Network")
+    run_neural_network(hotel_reviews, review_ratings)
